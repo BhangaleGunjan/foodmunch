@@ -26,26 +26,30 @@
 
     <!-- Contact Us Form Section -->
     <div class="container contact-us-container">
-        <div class="form-container">
-            <h2 class="contact-us-heading">Contact Us</h2>
-            <p class="contact-us-para">Got a question or feedback? Fill out the form below to get in touch with us!</p>
-
-
-            <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="floatingInput" placeholder="Enter your name">
-                <label for="floatingInput">Name</label>
+        <div class="container contact-us-container">
+            <div class="form-container">
+                <h2 class="contact-us-heading">Contact Us</h2>
+                <p class="contact-us-para">Got a question or feedback? Fill out the form below to get in touch with us!</p>
+                
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="floatingInputName" placeholder="Enter your name">
+                    <label for="floatingInputName">Name</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="floatingInputEmail" placeholder="Enter your Email">
+                    <label for="floatingInputEmail">Email Address</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="number" class="form-control" id="floatingInputPhone" placeholder="Enter your Phone Number">
+                    <label for="floatingInputPhone">Phone Number</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea" style="height: 100px"></textarea>
+                    <label for="floatingTextarea">Feedback</label>
+                </div>
+        
+                <button class="contact-sm-btn" onclick="sendEmail()">Send Email</button>
             </div>
-            <div class="form-floating mb-3">
-                <input type="email" class="form-control" id="floatingInput" placeholder="Enter your Email">
-                <label for="floatingInput">Email Address</label>
-            </div>
-            <div class="form-floating mb-3">
-                <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2"
-                    style="height: 100px"></textarea>
-                <label for="floatingTextarea2">Comments</label>
-            </div>
-
-            <input class="contact-sm-btn" type="submit" value="Send Message">
         </div>
 
         <!-- Team Section -->
