@@ -23,7 +23,7 @@ function toTwitter() {
 }
 
 function toInstagram() {
-    window.location.href = "https://www.instagram.com";
+    window.location.href = "https://www.instagram.com/bhangale_gunjan_";
 }
 
 function toFacebook() {
