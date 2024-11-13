@@ -48,7 +48,7 @@
                     <label for="floatingTextarea">Feedback</label>
                 </div>
         
-                <button class="contact-sm-btn" onclick="sendEmail()">Send Email</button>
+                <button class="contact-sm-btn" onclick="send()">Send Email</button>
             </div>
         </div>
 
@@ -104,6 +104,28 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Include jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<script>
+    function send() {
+  $.ajax({
+    url: 'https://api.telegram.org/bot7818610776:AAF1y5jm9i90hEurlw6Tp3ieAHaK__Fuu8o/sendMessage', // Replace with your endpoint
+    type: 'POST',
+    data: {
+      chat_id: '1206293950',
+      text: 'value2'
+    },
+    success: function(response) {
+      alert("Message sent successfully!");
+    },
+    error: function(xhr, status, error) {
+      alert("Something went wrong");
+    }
+  });
+    }
+</script>
+
 </body>
 
 </html>
