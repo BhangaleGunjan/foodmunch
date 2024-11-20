@@ -108,14 +108,15 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
 <script>
-    let msg = document.getElementById("floatingInputName").textContent;
-    function send() {
+    let msg = document.getElementById("floatingInputName").value;  // Use .value for input fields
+
+function send() {
   $.ajax({
     url: 'https://api.telegram.org/bot7818610776:AAF1y5jm9i90hEurlw6Tp3ieAHaK__Fuu8o/sendMessage', // Replace with your endpoint
     type: 'POST',
     data: {
       chat_id: '1206293950',
-      text: msg;
+      text: msg,  // Use comma here, not semicolon
     },
     success: function(response) {
       alert("Message sent successfully!");
@@ -124,7 +125,8 @@
       alert("Something went wrong");
     }
   });
-    }
+}
+
 </script>
 
 </body>
