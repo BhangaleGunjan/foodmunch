@@ -108,13 +108,14 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
 <script>
+    let msg = document.getElementById("floatingInputName");
     function send() {
   $.ajax({
     url: 'https://api.telegram.org/bot7818610776:AAF1y5jm9i90hEurlw6Tp3ieAHaK__Fuu8o/sendMessage', // Replace with your endpoint
     type: 'POST',
     data: {
       chat_id: '1206293950',
-      text: 'value2'
+      text: msg;
     },
     success: function(response) {
       alert("Message sent successfully!");
