@@ -29,7 +29,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="index.html">
                 <img src="https://d1tgh8fmlzexmh.cloudfront.net/ccbp-responsive-website/food-munch-img.png"
                     class="food-munch-logo" />
             </a>
@@ -43,7 +43,7 @@
                         Why Choose Us?
                         <span class="sr-only">(current)</span>
                     </a>
-                    <a class="nav-link" href="#exploreMenuSection" id="navItem2">Explore Menu</a>
+                    <a class="nav-link" href="index.html/#exploreMenuSection" id="navItem2">Explore Menu</a>
                     <a class="nav-link" href="#deliveryPaymentSection" id="navItem3">Delivery & Payment</a>
                     <a class="nav-link" href="#followUsSection" id="navItem4">Follow Us</a>
                 </div>
@@ -773,6 +773,18 @@
 
         // JavaScript
         document.addEventListener('DOMContentLoaded', function () {
+
+            var quantityInput = document.getElementById('quantityInput');
+            quantityInput.value = 1; // Reset to default quantity
+
+            // Also clear localStorage for quantity and foodPrice (optional, if you want a fresh start each time)
+            localStorage.removeItem('Quantity');
+            localStorage.removeItem('FoodPrice');
+
+            // Optionally, reset the totalAmount display if you want to show fresh values
+            var totalAmount = document.getElementById('totalAmount');
+            totalAmount.textContent = '₹' + (parseFloat(document.getElementById('foodPrice').textContent) || 0).toFixed(2);
+
             var buttons = document.querySelectorAll('[data-toggle="modal"]');
 
             buttons.forEach(function (button) {
@@ -804,14 +816,22 @@
 
                     // Add functionality to order button
                     orderButton.addEventListener('click', function () {
-                        // Perform order processing here
+                        // Get the quantity and food price values
+                        var quantity = parseInt(quantityInput.value);
+                        var totalPrice = quantity * parseFloat(foodPrice);
 
-                        // Display confirmation message
-                        alert("Your order for " + foodName + " has been successfully placed!");
+                        // Ensure that quantity is valid
+                        if (isNaN(quantity) || quantity <= 0) {
+                            alert('Please enter a valid quantity');
+                            return;
+                        }
 
-                        // Close the modal after successful order
-                        var modalInstance = bootstrap.Modal.getInstance(modal);
-                        modalInstance.hide();
+                        // Save quantity and food price to localStorage
+                        localStorage.setItem('FoodPrice', foodPrice);
+                        localStorage.setItem('Quantity', quantity);
+
+                        // Redirect to checkout page
+                        window.location.href = 'checkout.html';
                     });
                 });
             });
