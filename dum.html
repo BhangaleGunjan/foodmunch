@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Example with AJAX</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+</head>
+
+<body>
+    <h1>QR Code Image</h1>
+    <img id="qrCodeImage" alt="QR Code" />
+    <button onclick="sendData()">Send Data</button>
+    <br>
+    <div id="timeLeftDiv">Time Left: 2m 0s</div>
+
+    <script>
+        function sendData() {
+            const url = "https://sandip.freewebhostmost.com/project/save_order.php";
+            const payload = {
+                name: "value1",
+                email: "value2",
+                mobile: "5184",
+                mode: "UPI",
+                quantity: "1",
+                item_name: "hshs",
+                address: "value2",
+                amount: "1"
+            };
+
+            // Sending the POST request with AJAX
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: payload,
+                contentType: "application/x-www-form-urlencoded",
+                success: function (res) {
+                    let data = JSON.parse(res);
+                    console.log("Response received:", data.message);
+
+
+
+                    if (data.status == 200) {
+                        if (data.qr_data) {
+                            const qrCodeData = data.qr_data;
+                            console.log(qrCodeData);
+
+                            // Encode the QR code data into Base64
+                            const base64Data = qrCodeData;
+
+                            if (base64Data) {
+                                // Update the image source with the base64 data
+                                $("#qrCodeImage").attr("src", data: image / png; base64, ${ base64Data });
+        } else {
+            console.log("Base64 data is empty or invalid.");
+        }
+        sendPostRequest(data.order_id);
+                        } else {
+            console.error("QR code data key not found in the response.");
+        }
+                    } else if (data.status == 201) {
+            swal("Order Placed!", "You will receive your order soon", "success");
+
+        } else {
+            console.warn("Unexpected status value:", data.status);
+        }
+                },
+        error: function (xhr, status, error) {
+            console.error("AJAX error:", error);
+        }
+            });
+        }
+
+        async function sendPostRequest(id) {
+            const url = "https://sandip.freewebhostmost.com/project/check_status.php";
+            const payload = { order_id: id };
+            const timeout = 1 * 60 * 1000; // 2 minutes in milliseconds
+            const startTime = Date.now();
+
+            // Get the div where the remaining time will be displayed
+            const timeLeftDiv = document.getElementById('timeLeftDiv');
+
+            while (true) {
+                try {
+                    // Calculate the remaining time
+                    const elapsedTime = Date.now() - startTime;
+                    const remainingTime = timeout - elapsedTime;
+
+                    // If time is left, update the display
+                    if (remainingTime > 0) {
+                        const remainingSeconds = Math.floor(remainingTime / 1000);
+                        const minutes = Math.floor(remainingSeconds / 60);
+                        const seconds = remainingSeconds % 60;
+
+                        // Display the time left in the div
+                        timeLeftDiv.textContent = Time Left: ${ minutes }m ${ seconds } s;
+                    } else {
+                        // If time is over, stop the loop and display timeout message
+                        timeLeftDiv.textContent = "Time is up! Request stopped.";
+                        swal("Expired!", "Your payment request is expired", "error");
+                        break;
+                    }
+
+                    // Sending the POST request with AJAX
+                    const response = await $.ajax({
+                        url: url,
+                        type: "POST",
+                        data: payload,
+                        contentType: "application/x-www-form-urlencoded",
+                    });
+
+                    if (response.status == 200) {
+                        swal("Order Placed!", "You will receive your order soon", "success");
+                        break;
+                    } else if (response.status == 250) {
+                        //console.log("Continuing the loop...");
+                    } else {
+                        console.error("Unexpected status:", response.status);
+                        break;
+                    }
+
+                    // Wait for 1 second before retrying
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                } catch (error) {
+                    console.error("Error in status check:", error);
+                    break;
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

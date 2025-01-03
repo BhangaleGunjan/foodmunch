@@ -20,6 +20,8 @@
     <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -145,9 +147,45 @@
 
             <br>
 
-            <button class="btn btn-warning" id="proceedBtn">Proceed to Payment</button>
+            <!-- <button class="btn btn-warning" id="proceedBtn">Proceed to Payment</button> -->
+            <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#exampleModalCenter"
+                id="proceedBtn">
+                Proceed to Payment
+            </button>
 
         </form>
+
+        <!-- Button trigger modal -->
+        <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+            kahitari
+        </button> -->
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+            aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">UPI QR</h5>
+                        <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button> -->
+                    </div>
+                    <div class="modal-body">
+                        <img id="qrCodeImage" src="" alt="">
+                    </div>
+                    <div class="modal-footer">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <p id="timeLeftDiv"></p>
+                        <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -208,30 +246,108 @@
                 // You can replace this section with your QR code integration
             }
 
-            fetch('https://api.telegram.org/bot7818610776:AAF1y5jm9i90hEurlw6Tp3ieAHaK__Fuu8o/sendMessage', {
+            // https://api.telegram.org/bot7818610776:AAF1y5jm9i90hEurlw6Tp3ieAHaK__Fuu8o/sendMessage
+            fetch('https://sandip.freewebhostmost.com/project/save_order.php', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: JSON.stringify({
-                    chat_id: '1206293950',
-                    text: `New order received!\n\nName: ${name}\nEmail: ${email}\nPhone: ${phone}\nAddress: ${address}\nPayment Method: ${paymentMethod}\nTotal Amount: ₹${totalAmount}`
-                })
+                body: new URLSearchParams({
+                    name: name,
+                    email: email,
+                    mobile: phone,
+                    quantity: 1,
+                    item_name: "2",
+                    address: address,
+                    amount: totalAmount,
+                    mode: paymentMethod,
+                }),
             })
                 .then(response => {
                     if (response.ok) {
-                        return response.json();
+                        return response.json(); // Parse the JSON response
                     } else {
                         throw new Error('Network response was not ok');
                     }
                 })
                 .then(data => {
-                    alert("Order placed successfully!");
+                    // Assuming `data` contains a message or order details
+                    if (data.status === 201) { // Check if the response indicates success
+                        swal("Order received successfully!", `Order ID: ${data.order_id}`, "success");
+                    } else if (data.status === 200) {
+                        // SHow UPI QR
+                        sendPostRequest(data.order_id);
+                        document.getElementById('qrCodeImage').src = "data:image/png;base64," + data.qr_data; // Assuming `qrCodeUrl` contains the QR code image URL
+                        $('#exampleModalCenter').modal('show'); // Open the modal
+                    }
+                    else {
+                        alert("Order failed"); // Handle failure messages from the API
+                    }
                 })
                 .catch(error => {
-                    alert("Something went wrong: " + error.message);
+                    // alert("Something went wrong: " + error.message);
+                    console.error("Error Details:", error);
                 });
+
         });
+
+        async function sendPostRequest(id) {
+            const url = "https://sandip.freewebhostmost.com/project/check_status.php";
+            const payload = { order_id: id };
+            const timeout = 1 * 60 * 1000; // 2 minutes in milliseconds
+            const startTime = Date.now();
+
+            // Get the div where the remaining time will be displayed
+            const timeLeftDiv = document.getElementById('timeLeftDiv');
+
+            while (true) {
+                try {
+                    // Calculate the remaining time
+                    const elapsedTime = Date.now() - startTime;
+                    const remainingTime = timeout - elapsedTime;
+
+                    // If time is left, update the display
+                    if (remainingTime > 0) {
+                        const remainingSeconds = Math.floor(remainingTime / 1000);
+                        const minutes = Math.floor(remainingSeconds / 60);
+                        const seconds = remainingSeconds % 60;
+
+                        // Display the time left in the div
+                        timeLeftDiv.textContent = `Time Left: ${minutes}m ${seconds}s`;
+                    } else {
+                        // If time is over, stop the loop and display timeout message
+                        timeLeftDiv.textContent = "Time is up! Request stopped.";
+                        swal("Expired!", "Your payment request is expired", "error");
+                        break;
+                    }
+
+                    // Sending the POST request with AJAX
+                    const response = await $.ajax({
+                        url: url,
+                        type: "POST",
+                        data: payload,
+                        contentType: "application/x-www-form-urlencoded",
+                    });
+
+                    if (response.status == 200) {
+                        swal("Order Placed!", "You will receive your order soon", "success");
+                        break;
+                    } else if (response.status == 250) {
+                        //console.log("Continuing the loop...");
+                    } else {
+                        console.error("Unexpected status:", response.status);
+                        break;
+                    }
+
+                    // Wait for 1 second before retrying
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                } catch (error) {
+                    console.error("Error in status check:", error);
+                    break;
+                }
+            }
+        }
 
 
     </script>
